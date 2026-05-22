@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نظام استقبال SE 5\22</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070d1a;--s:#0f1929;--card:#162236;--b:#243550;--blue:#3b82f6;--gold:#f59e0b;--green:#10b981;--red:#ef4444;--txt:#e2e8f0;--muted:#64748b}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px;background-image:radial-gradient(ellipse at 15% 15%,rgba(59,130,246,.09) 0,transparent 55%),radial-gradient(ellipse at 85% 85%,rgba(245,158,11,.06) 0,transparent 55%)}
+header{text-align:center;margin-bottom:20px;animation:fD .5s ease}
+header h1{font-size:1.7rem;font-weight:900;background:linear-gradient(135deg,#60a5fa,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+header p{color:var(--muted);font-size:.85rem;margin-top:3px}
+.tabs{display:flex;gap:8px;margin-bottom:18px;width:100%;max-width:560px}
+.tab{flex:1;padding:10px;background:var(--s);border:2px solid var(--b);border-radius:12px;color:var(--muted);font-family:'Cairo',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:.2s}
+.tab.active{background:rgba(59,130,246,.15);border-color:var(--blue);color:#93c5fd}
+.stats-row{display:flex;gap:8px;width:100%;max-width:560px;margin-bottom:16px}
+.stat{flex:1;background:var(--card);border:1px solid var(--b);border-radius:12px;padding:10px;text-align:center}
+.stat .n{font-size:1.4rem;font-weight:900}.stat .t{font-size:.7rem;color:var(--muted);margin-top:1px}
+.stat.g .n{color:#34d399}.stat.r .n{color:#f87171}.stat.gold .n{color:#fbbf24}.stat.bl .n{color:#60a5fa}
+.search-wrap{width:100%;max-width:560px;position:relative;margin-bottom:14px}
+.search-wrap input{width:100%;padding:15px 50px 15px 18px;background:var(--card);border:2px solid var(--b);border-radius:14px;color:var(--txt);font-family:'Cairo',sans-serif;font-size:1.05rem;outline:none;transition:.2s;direction:rtl}
+.search-wrap input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+.search-wrap .ico{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:1.1rem;opacity:.45}
+#sugg{width:100%;max-width:560px;background:var(--card);border:1px solid var(--b);border-radius:12px;overflow:hidden;margin-top:-10px;margin-bottom:12px;display:none;z-index:10;position:relative}
+.si{padding:11px 18px;cursor:pointer;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;align-items:center;font-size:.95rem;transition:background .15s}
+.si:last-child{border-bottom:none}.si:hover{background:rgba(59,130,246,.12)}
+.si .sp{color:var(--muted);font-size:.8rem;direction:ltr}
+#result{width:100%;max-width:560px}
+.rc{border-radius:18px;padding:24px 20px;margin-bottom:10px;border:2px solid;text-align:center;animation:pop .3s cubic-bezier(.34,1.56,.64,1)}
+.rc .lbl{font-size:.75rem;letter-spacing:1px;opacity:.6;margin-bottom:4px}
+.rc .nm{font-size:1.45rem;font-weight:900;margin-bottom:3px}
+.rc .ph{font-size:.85rem;opacity:.55;margin-bottom:14px;direction:ltr;display:inline-block}
+.rc .vd{font-size:1.1rem;font-weight:700;padding:10px 20px;border-radius:10px;display:inline-block;margin-top:4px}
+.rc .badge{display:inline-block;padding:3px 12px;border-radius:20px;font-size:.82rem;font-weight:700;margin-bottom:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
+.cg{background:linear-gradient(135deg,rgba(16,185,129,.12),rgba(16,185,129,.03));border-color:#10b981}
+.cg .vd{background:rgba(16,185,129,.18);color:#34d399}
+.cgo{background:linear-gradient(135deg,rgba(245,158,11,.14),rgba(245,158,11,.03));border-color:#f59e0b}
+.cgo .vd{background:rgba(245,158,11,.18);color:#fbbf24}
+.cr{background:linear-gradient(135deg,rgba(239,68,68,.12),rgba(239,68,68,.03));border-color:#ef4444}
+.cr .vd{background:rgba(239,68,68,.18);color:#f87171}
+.cn{background:rgba(100,116,139,.08);border-color:var(--b)}
+.cn .vd{background:rgba(100,116,139,.18);color:#94a3b8}
+.ib{font-size:2.6rem;margin-bottom:8px;display:block}
+#statsPanel{width:100%;max-width:560px;display:none}
+.sp-title{font-size:1rem;font-weight:700;margin-bottom:12px;color:#93c5fd;text-align:center}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.sg{background:var(--card);border:1px solid var(--b);border-radius:12px;padding:14px;text-align:center}
+.sg .sn{font-size:1.6rem;font-weight:900}.sg .st{font-size:.75rem;color:var(--muted);margin-top:2px}
+.sg.g .sn{color:#34d399}.sg.r .sn{color:#f87171}.sg.gold .sn{color:#fbbf24}.sg.bl .sn{color:#60a5fa}
+.pct-bar{background:var(--s);border-radius:8px;height:8px;overflow:hidden;margin-top:8px}
+.pct-fill{height:100%;border-radius:8px;transition:width .6s ease}
+.att-list{background:var(--card);border:1px solid var(--b);border-radius:12px;overflow:hidden;max-height:400px;overflow-y:auto}
+.att-header{padding:10px 16px;background:rgba(59,130,246,.1);font-weight:700;font-size:.85rem;color:#93c5fd;border-bottom:1px solid var(--b);display:flex;justify-content:space-between}
+.att-item{padding:10px 16px;border-bottom:1px solid rgba(36,53,80,.5);display:flex;justify-content:space-between;align-items:center;font-size:.88rem}
+.att-item:last-child{border-bottom:none}
+.att-item .an{font-weight:600}
+.att-item .at{font-size:.75rem;color:var(--muted)}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-left:6px}
+.dot.g{background:#34d399}.dot.gold{background:#fbbf24}
+.export-btn{width:100%;padding:12px;background:rgba(59,130,246,.15);border:2px solid var(--blue);border-radius:12px;color:#93c5fd;font-family:'Cairo',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;margin-top:12px;transition:.2s}
+.export-btn:hover{background:rgba(59,130,246,.25)}
+@keyframes fD{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎓 نظام الاستقبال</h1>
+  <p>SE 5\22 — ورشة العمل</p>
+</header>
+<div class="stats-row" id="topStats"></div>
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('search')">🔍 بحث مشترك</button>
+  <button class="tab" onclick="switchTab('stats')">📊 إحصائيات الدخول</button>
+</div>
+<div id="searchPanel">
+  <div class="search-wrap">
+    <input type="text" id="si" placeholder="اكتب اسم المشترك..." oninput="hs()" autocomplete="off"/>
+    <span class="ico">🔍</span>
+  </div>
+  <div id="sugg"></div>
+  <div id="result"></div>
+</div>
+<div id="statsPanel">
+  <div class="sp-title">📊 سجل الدخول — الورشة</div>
+  <div class="stat-grid" id="statGrid"></div>
+  <div class="att-list">
+    <div class="att-header"><span>الاسم</span><span>الوقت</span></div>
+    <div id="attItems" style="color:var(--muted);text-align:center;padding:20px;font-size:.9rem">لم يتم تسجيل أي دخول بعد</div>
+  </div>
+  <button class="export-btn" onclick="exportCSV()">⬇️ تصدير سجل الدخول (CSV)</button>
+</div>
+<script>
+const DATA = [{"rowNum": 2, "name": "طه كريم جابر", "phone": "7721968342", "value": "500", "payment": "partial"}, {"rowNum": 3, "name": "محمد عبد الكريم", "phone": "7704888200", "value": "700", "payment": "partial"}, {"rowNum": 4, "name": "يحيى إبراهيم", "phone": "7809183001", "value": "700", "payment": "partial"}, {"rowNum": 5, "name": "عمر مصطفى", "phone": "7727677205", "value": "VIP", "payment": "full"}, {"rowNum": 6, "name": "محمد فارس", "phone": "7802048000", "value": "500", "payment": "full"}, {"rowNum": 7, "name": "كرار امجد", "phone": "7808694784", "value": "500", "payment": "full"}, {"rowNum": 8, "name": "قاسم جمال", "phone": "7717212228", "value": "500", "payment": "full"}, {"rowNum": 9, "name": "علي خليل", "phone": "7703477336", "value": "500", "payment": "full"}, {"rowNum": 10, "name": "محمد عباس", "phone": "7709413471", "value": "500", "payment": "full"}, {"rowNum": 11, "name": "احمد اثير", "phone": "7804430200", "value": "500", "payment": "full"}, {"rowNum": 12, "name": "علي الشيخلي", "phone": "7712255838", "value": "500", "payment": "full"}, {"rowNum": 13, "name": "عبد الرحمن خالد", "phone": "7517654651", "value": "500", "payment": "full"}, {"rowNum": 14, "name": "عبد الله بكر", "phone": "7702530188", "value": "500", "payment": "full"}, {"rowNum": 15, "name": "يحيى قاسم", "phone": "7875455507", "value": "500", "payment": "full"}, {"rowNum": 16, "name": "مصطفى عصام", "phone": "7712213458", "value": "500", "payment": "full"}, {"rowNum": 17, "name": "مرتضى هادي", "phone": "7716440264", "value": "500", "payment": "full"}, {"rowNum": 18, "name": "امين احسان", "phone": "7867336991", "value": "500", "payment": "full"}, {"rowNum": 19, "name": "خالد سلمان", "phone": "7727028326", "value": "500", "payment": "full"}, {"rowNum": 20, "name": "مصطفى عبدالرحمن", "phone": "7705307251", "value": "0", "payment": "full"}, {"rowNum": 21, "name": "مصطفى عز الدين", "phone": "7901681286", "value": "0", "payment": "full"}, {"rowNum": 22, "name": "صفاء بهاء يوسف علي", "phone": "07800399178 or 07700149365", "value": "VIP", "payment": "full"}, {"rowNum": 23, "name": "حسن عمار ناهض", "phone": "07772900091 or 07700149397", "value": "500", "payment": "full"}, {"rowNum": 24, "name": "مثنى عبد الرزاق عطية", "phone": "07705797848", "value": "500", "payment": "full"}, {"rowNum": 25, "name": "حيدر عبد الرزاق", "phone": "7829050163", "value": "VIP", "payment": "partial"}, {"rowNum": 26, "name": "امير حسين", "phone": "7775297337", "value": "700", "payment": "partial"}, {"rowNum": 27, "name": "محمد زهير", "phone": "7716088509", "value": "500", "payment": "partial"}, {"rowNum": 28, "name": "احمد قصاب باشي", "phone": "7702041427", "value": "500", "payment": "full"}, {"rowNum": 29, "name": "مصطفى حقي", "phone": "7709814570", "value": "500", "payment": "full"}, {"rowNum": 30, "name": "حميد سعيد", "phone": "7884345773", "value": "500", "payment": "partial"}, {"rowNum": 31, "name": "زهراء احمد", "phone": "7703811712", "value": "500", "payment": "partial"}, {"rowNum": 32, "name": "علي عادل", "phone": "7730829930‬", "value": "500", "payment": "full"}, {"rowNum": 33, "name": "فارس سلطان", "phone": "7705574215", "value": "500", "payment": "partial"}, {"rowNum": 34, "name": "امين علي اياد", "phone": "7715146449", "value": "700", "payment": "partial"}, {"rowNum": 35, "name": "شروق جبار رشناو", "phone": "7867337232", "value": "700", "payment": "partial"}, {"rowNum": 36, "name": "محمد سعد جبار", "phone": "7713428061", "value": "700", "payment": "full"}, {"rowNum": 37, "name": "كرار جميل الياسري", "phone": "7826455659", "value": "500", "payment": "partial"}, {"rowNum": 38, "name": "هبة ناظم", "phone": "7829995394", "value": "500", "payment": "partial"}, {"rowNum": 39, "name": "يوسف هشام عباس", "phone": "7902285755", "value": "700", "payment": "partial"}, {"rowNum": 40, "name": "بيداء", "phone": "7730200072", "value": "500", "payment": "partial"}, {"rowNum": 41, "name": "زين العابدين محمد", "phone": "7816885404", "value": "700", "payment": "full"}, {"rowNum": 42, "name": "خالد مراد النجار", "phone": "7707891280", "value": "700", "payment": "partial"}, {"rowNum": 43, "name": "احمد مازن", "phone": "7700034346", "value": "500", "payment": "partial"}, {"rowNum": 44, "name": "زينب صبري فارس", "phone": "7713203332", "value": "500", "payment": "partial"}, {"rowNum": 45, "name": "حمزة زهير عبد الستار", "phone": "7730606094", "value": "500", "payment": "full"}, {"rowNum": 46, "name": "علي بدر هلال", "phone": "7809235907", "value": "500", "payment": "partial"}, {"rowNum": 47, "name": "زينب مالك", "phone": "7812259102", "value": "500", "payment": "partial"}, {"rowNum": 48, "name": "لينا عمار", "phone": "7816032008", "value": "500", "payment": "full"}, {"rowNum": 49, "name": "رضا عماد", "phone": "7823910002", "value": "500", "payment": "partial"}, {"rowNum": 50, "name": "مصطفى حيدر", "phone": "7831801018", "value": "500", "payment": "full"}, {"rowNum": 51, "name": "علي مرتضى", "phone": "7738282857", "value": "500", "payment": "full"}, {"rowNum": 52, "name": "دكتورة زهراء الشيباني", "phone": "7711914079", "value": "500", "payment": "full"}, {"rowNum": 53, "name": "رضا عبد الباسط الحديثي", "phone": "7711711661", "value": "500", "payment": "partial"}, {"rowNum": 54, "name": "حسن عدنان", "phone": "7715551318", "value": "700", "payment": "partial"}, {"rowNum": 55, "name": "عهود العبيدي", "phone": "7746686658", "value": "500", "payment": "full"}, {"rowNum": 56, "name": "سرى حسن شمخي", "phone": "7718777740", "value": "700", "payment": "partial"}, {"rowNum": 57, "name": "هشام مزهر", "phone": "7837608693", "value": "500", "payment": "partial"}, {"rowNum": 58, "name": "سرى محمد الحديثي", "phone": "07714091989", "value": "500", "payment": "partial"}, {"rowNum": 59, "name": "شيماء شاكر", "phone": "7519091712", "value": "500", "payment": "partial"}, {"rowNum": 60, "name": "مريم وليد", "phone": "7741776467", "value": "500", "payment": "full"}, {"rowNum": 61, "name": "احمد فرحان", "phone": "7807081448", "value": "VIP", "payment": "full"}, {"rowNum": 62, "name": "وداد فرحان", "phone": "7736480979", "value": "VIP", "payment": "full"}, {"rowNum": 63, "name": "اهاجید زين العابدين", "phone": "7711005792", "value": "500", "payment": "full"}, {"rowNum": 64, "name": "ماجد كريم", "phone": "7707721232", "value": "500", "payment": "full"}, {"rowNum": 65, "name": "خالد السعدي", "phone": "7763760812", "value": "VIP", "payment": "full"}, {"rowNum": 66, "name": "عبد الرحمن زيدان", "phone": "7819924493", "value": "500", "payment": "partial"}, {"rowNum": 67, "name": "علي السعد", "phone": "7732619800", "value": "500", "payment": "full"}, {"rowNum": 68, "name": "تمارا ثامر", "phone": "7721244777", "value": "500", "payment": "full"}, {"rowNum": 69, "name": "سرهنك امين عبد الله", "phone": "7504357008", "value": "500", "payment": "partial"}, {"rowNum": 70, "name": "جلنك امين عبد الله", "phone": "7504584669", "value": "500", "payment": "partial"}, {"rowNum": 71, "name": "محمد الميراني", "phone": "7700770736", "value": "500", "payment": "partial"}, {"rowNum": 72, "name": "محمد عبد الجليل المنصوري", "phone": "7702721292", "value": "500", "payment": "full"}, {"rowNum": 73, "name": "حسين اياد جواد", "phone": "7712087904", "value": "VIP", "payment": "partial"}, {"rowNum": 74, "name": "زهراء فاضل", "phone": "7710229549", "value": "500", "payment": "partial"}, {"rowNum": 75, "name": "علي كاظم", "phone": "7804131103", "value": "700", "payment": "full"}, {"rowNum": 76, "name": "ياسمين فارس", "phone": "7804218381", "value": "500", "payment": "full"}, {"rowNum": 77, "name": "عباس ليث", "phone": "7821202684", "value": "500", "payment": "partial"}, {"rowNum": 78, "name": "رضا علاء عبد الزهرة", "phone": "7823332298", "value": "500", "payment": "full"}, {"rowNum": 79, "name": "مريم حمزة", "phone": "‪7859466963‬", "value": "500", "payment": "partial"}, {"rowNum": 80, "name": "علي عمار", "phone": "07812897283", "value": "VIP", "payment": "full"}, {"rowNum": 81, "name": "احمد سعد", "phone": "7706243102", "value": "500", "payment": "full"}, {"rowNum": 82, "name": "عامر عبد العال", "phone": "7815734044", "value": "700", "payment": "full"}, {"rowNum": 83, "name": "علي بشار", "phone": "7722400764", "value": "500", "payment": "partial"}, {"rowNum": 84, "name": "عبد الرحمن خلدون حسين", "phone": "7504742549", "value": "500", "payment": "full"}, {"rowNum": 85, "name": "منتظر مهدي", "phone": "07730013400 - 07811490400", "value": "500", "payment": "full"}, {"rowNum": 86, "name": "حوراء محمد", "phone": "7725300777", "value": "500", "payment": "full"}, {"rowNum": 87, "name": "رغد اركان", "phone": "7709742917", "value": "500", "payment": "partial"}, {"rowNum": 88, "name": "مريم منير", "phone": "7765569464", "value": "500", "payment": "partial"}, {"rowNum": 89, "name": "فرح تحسين", "phone": "7702812046", "value": "500", "payment": "partial"}, {"rowNum": 90, "name": "نجوى محمد رضا", "phone": "7709472681", "value": "500", "payment": "partial"}, {"rowNum": 91, "name": "كرار حيدر", "phone": "7740232074", "value": "500", "payment": "partial"}, {"rowNum": 92, "name": "غزوان محمد", "phone": "7756611464", "value": "500", "payment": "partial"}, {"rowNum": 93, "name": "نور تحسين", "phone": "7712644070", "value": "700", "payment": "partial"}, {"rowNum": 94, "name": "ضحى محمد", "phone": "7730999033", "value": "500", "payment": "full"}, {"rowNum": 95, "name": "احمد صلاح", "phone": "7882533490", "value": "700", "payment": "full"}, {"rowNum": 96, "name": "مصطفى وليد", "phone": "7838696994", "value": "700", "payment": "full"}, {"rowNum": 97, "name": "بسمة طلال", "phone": "+964 780 860 8200 - +964 790 174 4243", "value": "500", "payment": "partial"}, {"rowNum": 98, "name": "نبا قيس", "phone": "7740050028", "value": "VIP", "payment": "partial"}, {"rowNum": 99, "name": "نبا قيس", "phone": "7740050028", "value": "700", "payment": "partial"}, {"rowNum": 100, "name": "لبنى جليل شاكر", "phone": "7809712022", "value": "VIP", "payment": "partial"}, {"rowNum": 101, "name": "سعد جبار", "phone": "7870054591", "value": "VIP", "payment": "partial"}, {"rowNum": 102, "name": "مروة نصيف", "phone": "7713664130", "value": "VIP", "payment": "partial"}, {"rowNum": 103, "name": "منيف زيدان", "phone": "7714741777", "value": "700", "payment": "partial"}, {"rowNum": 104, "name": "منيف زيدان", "phone": "", "value": "700", "payment": "partial"}, {"rowNum": 105, "name": "منيف زيدان", "phone": "", "value": "700", "payment": "partial"}, {"rowNum": 106, "name": "قحطان عدنان", "phone": "7721385643", "value": "VIP", "payment": "partial"}, {"rowNum": 107, "name": "قحطان عدنان", "phone": "", "value": "500", "payment": "partial"}, {"rowNum": 108, "name": "قحطان عدنان", "phone": "", "value": "500", "payment": "partial"}, {"rowNum": 109, "name": "رضا ابو لحمة", "phone": "7866660044", "value": "700", "payment": "partial"}, {"rowNum": 110, "name": "يوسف سعيد", "phone": "7821301653", "value": "700", "payment": "partial"}, {"rowNum": 111, "name": "عباس رحيم", "phone": "7707687680 - 7712162809", "value": "700", "payment": "partial"}, {"rowNum": 112, "name": "علي عادل", "phone": "", "value": "500", "payment": "partial"}, {"rowNum": 113, "name": "هاشم فريق", "phone": "7832830118", "value": "500", "payment": "full"}, {"rowNum": 114, "name": "سيروان علي", "phone": "7867377987", "value": "500", "payment": "partial"}, {"rowNum": 115, "name": "زهراء فاضل علي", "phone": "7748080449", "value": "500", "payment": "partial"}, {"rowNum": 116, "name": "يونس محمود", "phone": "7701673673", "value": "700", "payment": "partial"}, {"rowNum": 117, "name": "زيد عبد الرزاق", "phone": "7847896028", "value": "700", "payment": "full"}, {"rowNum": 118, "name": "شمس الضحى جبار", "phone": "7705560706", "value": "500", "payment": "full"}, {"rowNum": 119, "name": "عمر حيدر الشمري", "phone": "7745573784", "value": "700", "payment": "partial"}, {"rowNum": 120, "name": "خلدون محمد", "phone": "7800110030", "value": "VIP", "payment": "full"}, {"rowNum": 121, "name": "عبد الواحد محمد", "phone": "7713819592", "value": "500", "payment": "partial"}, {"rowNum": 122, "name": "هادي الموسوي", "phone": "=+9647800567139", "value": "500", "payment": "partial"}, {"rowNum": 123, "name": "احمد عارف", "phone": "7812894153", "value": "700", "payment": "full"}, {"rowNum": 124, "name": "اياد ابراهيم", "phone": "773 050 3314", "value": "-", "payment": "partial"}, {"rowNum": 125, "name": "اكرم عصام حاتم", "phone": "07831113888", "value": "-", "payment": "partial"}, {"rowNum": 126, "name": "موج عمر النحاس", "phone": "7712233611", "value": "700", "payment": "full"}, {"rowNum": 127, "name": "محمد اركان", "phone": "7874664013", "value": "-", "payment": "partial"}, {"rowNum": 128, "name": "رافل دريد", "phone": "+964 771 666 6788", "value": "-", "payment": "full"}, {"rowNum": 129, "name": "ماجد كريم", "phone": "+964 770 772 1232", "value": "-", "payment": "full"}, {"rowNum": 130, "name": "د. احمد رزاق", "phone": "7826071973", "value": "-", "payment": "full"}, {"rowNum": 131, "name": "بنين حسين", "phone": "7801896007", "value": "500", "payment": "partial"}, {"rowNum": 132, "name": "سامر العاني", "phone": "7906143940", "value": "500", "payment": "full"}, {"rowNum": 133, "name": "عباس فاضل", "phone": "07805599850", "value": "500", "payment": "full"}, {"rowNum": 134, "name": "زهراء حسن", "phone": "‪7713978701‬", "value": "700", "payment": "full"}, {"rowNum": 135, "name": "ياسين فاضل", "phone": "07750200020", "value": "500", "payment": "full"}, {"rowNum": 136, "name": "ياسمين فارس", "phone": "780421838", "value": "500", "payment": "full"}, {"rowNum": 137, "name": "نور صعب", "phone": "7811129199", "value": "700", "payment": "full"}, {"rowNum": 138, "name": "احمد اللامي", "phone": "7852000011", "value": "500", "payment": "full"}, {"rowNum": 139, "name": "عبدالله عبدالكريم", "phone": "7838650450", "value": "500", "payment": "partial"}, {"rowNum": 140, "name": "سمية حسين", "phone": "7742846910", "value": "500", "payment": "partial"}, {"rowNum": 141, "name": "وئام محمد", "phone": "7737787388", "value": "500", "payment": "full"}, {"rowNum": 142, "name": "علي حسن فيصل الحسني", "phone": "783 335 5555", "value": "700", "payment": "full"}, {"rowNum": 143, "name": "زين العابدين حسن فيصل الحسني", "phone": "784 445 5555", "value": "500", "payment": "full"}, {"rowNum": 144, "name": "رفل جعفر يوسف", "phone": "773 016 2743", "value": "500", "payment": "full"}, {"rowNum": 145, "name": "فهد سليم خضير عباس الطائي", "phone": "7800166060", "value": "500", "payment": "full"}, {"rowNum": 146, "name": "عمر تحسين علي نافع العزاوي", "phone": "7727837031", "value": "500", "payment": "full"}, {"rowNum": 147, "name": "صباح رعد علوان حسين العبادي", "phone": "7739729123", "value": "500", "payment": "full"}, {"rowNum": 148, "name": "همام عطية حاتم يعقوب الجنابي", "phone": "7715646437", "value": "500", "payment": "full"}, {"rowNum": 149, "name": "مجتبى محمد جليل مجيد التميمي", "phone": "7827108674", "value": "500", "payment": "full"}, {"rowNum": 150, "name": "علي حيدر شهيب احمد علي", "phone": "7718456054", "value": "500", "payment": "full"}, {"rowNum": 151, "name": "عبدالله سعد داوود عبد حسن اللامي", "phone": "7710001431", "value": "500", "payment": "full"}, {"rowNum": 152, "name": "مهند رياض فاضل", "phone": "7700849814", "value": "500", "payment": "full"}, {"rowNum": 153, "name": "شهد صالح", "phone": "7773931685", "value": "500", "payment": "partial"}, {"rowNum": 154, "name": "همام  علي جديع", "phone": "7866999790", "value": "500", "payment": "full"}, {"rowNum": 155, "name": "محمد اسامه سلمان", "phone": "7726737293", "value": "500", "payment": "full"}, {"rowNum": 156, "name": "اكرم جبار", "phone": "7717374197", "value": "-", "payment": "partial"}, {"rowNum": 157, "name": "احمد سلام", "phone": "7711347467", "value": "-", "payment": "partial"}, {"rowNum": 158, "name": "علي حكيم", "phone": "7709903790", "value": "-", "payment": "partial"}, {"rowNum": 159, "name": "احمد محمود الدليمي", "phone": "7729221852", "value": "-", "payment": "full"}, {"rowNum": 160, "name": "احمد نعمان", "phone": "‪7714297686‬", "value": "-", "payment": "partial"}, {"rowNum": 161, "name": "علي محمد كاظم", "phone": "7808953322‬", "value": "500", "payment": "full"}, {"rowNum": 162, "name": "نور مجيد", "phone": "07710280139", "value": "-", "payment": "partial"}, {"rowNum": 163, "name": "منتضر يوسف", "phone": "7880999195", "value": "500", "payment": "full"}, {"rowNum": 164, "name": "عمار ياسر نوري", "phone": "7821738449", "value": "-", "payment": "partial"}, {"rowNum": 165, "name": "دعاء عبد الرحمن كامل", "phone": "7712391358", "value": "-", "payment": "partial"}, {"rowNum": 166, "name": "عمر احمد عبد الجبار", "phone": "7708220223", "value": "-", "payment": "partial"}, {"rowNum": 167, "name": "عبير نبيل ابراهيم", "phone": "7773446352", "value": "-", "payment": "partial"}, {"rowNum": 168, "name": "جيان محمد", "phone": "7507126467", "value": "-", "payment": "full"}, {"rowNum": 169, "name": "زيرفان محمد", "phone": "7504806988", "value": "-", "payment": "full"}, {"rowNum": 170, "name": "اكرم البهادلي", "phone": "7732209200", "value": "-", "payment": "partial"}, {"rowNum": 171, "name": "احمد المياحي", "phone": "7722227704", "value": "-", "payment": "partial"}, {"rowNum": 172, "name": "احمد فؤاد عبد اللطيف", "phone": "7729120008", "value": "-", "payment": "full"}, {"rowNum": 173, "name": "عباس فاضل", "phone": "7763820080", "value": "-", "payment": "full"}, {"rowNum": 174, "name": "جيهان سمير متاني", "phone": "7717832073", "value": "-", "payment": "full"}, {"rowNum": 175, "name": "فاطمة حسين عبد الحسن", "phone": "7732227732", "value": "-", "payment": "partial"}, {"rowNum": 176, "name": "عشتار عماد", "phone": "7760111192", "value": "-", "payment": "partial"}, {"rowNum": 177, "name": "علي جميل", "phone": "7711299401", "value": "-", "payment": "partial"}, {"rowNum": 178, "name": "دكتور عماد عادل", "phone": "7711122133", "value": "VIP", "payment": "full"}, {"rowNum": 179, "name": "كوران قادر صالح", "phone": "7700249090", "value": "-", "payment": "partial"}, {"rowNum": 180, "name": "سلطان ليث محمود", "phone": "7902319935", "value": "500", "payment": "partial"}];
+
+const PARTICIPANTS = DATA;
+let attendance = [];
+
+function norm(s){ return s.replace(/[أإآا]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').toLowerCase().trim(); }
+
+function getCategory(p){
+  const isVIP = p.value==='VIP';
+  const isFull = p.payment==='full';
+  if(isVIP && isFull) return 'vip_full';
+  if(isVIP && !isFull) return 'vip_partial';
+  if(!isVIP && isFull) return 'full';
+  return 'partial';
+}
+
+function renderTopStats(){
+  const total = PARTICIPANTS.length;
+  const vipFull = PARTICIPANTS.filter(p=>getCategory(p)==='vip_full').length;
+  const full = PARTICIPANTS.filter(p=>getCategory(p)==='full').length;
+  const partial = PARTICIPANTS.filter(p=>p.payment==='partial').length;
+  document.getElementById('topStats').innerHTML=`
+    <div class="stat bl"><div class="n">${total}</div><div class="t">إجمالي</div></div>
+    <div class="stat g"><div class="n">${full+vipFull}</div><div class="t">دفع كامل</div></div>
+    <div class="stat gold"><div class="n">${vipFull}</div><div class="t">VIP</div></div>
+    <div class="stat r"><div class="n">${partial}</div><div class="t">باقي مبلغ</div></div>
+  `;
+}
+renderTopStats();
+
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',
+    (tab==='search'&&i===0)||(tab==='stats'&&i===1)));
+  document.getElementById('searchPanel').style.display=tab==='search'?'block':'none';
+  document.getElementById('statsPanel').style.display=tab==='stats'?'block':'none';
+  if(tab==='stats') renderStatsPanel();
+}
+
+function hs(){
+  const q=document.getElementById('si').value.trim();
+  const sg=document.getElementById('sugg');
+  const rb=document.getElementById('result');
+  if(!q){sg.style.display='none';rb.innerHTML='';return;}
+  const matches=PARTICIPANTS.filter(p=>norm(p.name).includes(norm(q)));
+  if(matches.length===1){sg.style.display='none';showResult(matches[0]);}
+  else if(matches.length>1){
+    rb.innerHTML='';sg.style.display='block';
+    sg.innerHTML=matches.map(p=>`<div class="si" onclick="selP(${p.rowNum})">
+      <span>${p.name}</span><span class="sp">${p.phone}</span></div>`).join('');
+  } else {
+    sg.style.display='none';
+    rb.innerHTML=`<div class="rc cn"><span class="ib">❓</span><div class="nm">غير موجود</div>
+    <div class="vd">الاسم غير مسجل في القائمة</div></div>`;
+  }
+}
+
+function selP(rowNum){
+  const p=PARTICIPANTS.find(x=>x.rowNum===rowNum);
+  document.getElementById('sugg').style.display='none';
+  document.getElementById('si').value=p.name;
+  showResult(p);
+}
+
+function showResult(p){
+  const cat=getCategory(p);
+  let cls,icon,verdict;
+  if(cat==='vip_full'){cls='cgo';icon='👑';verdict='✅ VIP — دفع كامل<br><small>وجّهه لمقاعد VIP</small>';}
+  else if(cat==='vip_partial'){cls='cr';icon='👑';verdict='❌ VIP — باقي مبلغ<br><small>وجّهه للحسابات أولاً</small>';}
+  else if(cat==='full'){cls='cg';icon='✅';verdict='يدخل مباشرة';}
+  else{cls='cr';icon='⚠️';verdict='باقي مبلغ — وجّهه للحسابات';}
+
+  const already=attendance.find(a=>a.rowNum===p.rowNum);
+  const enteredBadge=already?`<div style="color:#fbbf24;font-size:.8rem;margin-bottom:8px">⏱ دخل: ${already.time}</div>`:'';
+
+  document.getElementById('result').innerHTML=`
+    <div class="rc ${cls}">
+      <span class="ib">${icon}</span>
+      <div class="lbl">مشترك</div>
+      <div class="nm">${p.name}</div>
+      <div class="ph">${p.phone}</div><br>
+      ${p.value!=='-'?`<span class="badge">${p.value==='VIP'?'VIP':p.value+' $'}</span><br>`:''}
+      ${enteredBadge}
+      <div class="vd">${verdict}</div>
+      ${(cat==='vip_full'||cat==='full')&&!already?`<br><button onclick="markEntered(${p.rowNum})"
+        style="margin-top:12px;padding:8px 20px;background:rgba(16,185,129,.2);border:1px solid #10b981;
+        border-radius:8px;color:#34d399;font-family:'Cairo',sans-serif;font-weight:700;cursor:pointer;font-size:.9rem">
+        ✔ تسجيل الدخول</button>`:''}
+    </div>`;
+}
+
+async function markEntered(rowNum){
+  if(attendance.find(a=>a.rowNum===rowNum)) return;
+  const p=PARTICIPANTS.find(x=>x.rowNum===rowNum);
+  const now=new Date();
+  const time=now.toLocaleTimeString('ar-IQ',{hour:'2-digit',minute:'2-digit'});
+  attendance.push({rowNum,name:p.name,phone:p.phone,value:p.value,payment:p.payment,time});
+  
+  // الكتابة في الشيت
+  try{
+    await fetch('https://script.google.com/macros/s/AKfycbwTl_D09yrteOtnsl0NcIqL_RkgM_mteGMXGK9zCdck1kVgiziKDGcaAaVjvzDozA3OMw/exec',{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({rowNum,time})
+    });
+  }catch(e){console.log('حُفظ محلياً');}
+  
+  renderTopStats();
+  showResult(p);
+}
+
+function renderStatsPanel(){
+  const total=PARTICIPANTS.length;
+  const entered=attendance.length;
+  const vipIn=attendance.filter(a=>a.value==='VIP').length;
+  const normalIn=entered-vipIn;
+  const pct=total>0?Math.round(entered/total*100):0;
+  document.getElementById('statGrid').innerHTML=`
+    <div class="sg bl"><div class="sn">${entered}</div><div class="st">دخلوا الورشة</div>
+      <div class="pct-bar"><div class="pct-fill" style="width:${pct}%;background:#3b82f6"></div></div></div>
+    <div class="sg"><div class="sn" style="color:#94a3b8">${total-entered}</div><div class="st">لم يصلوا بعد</div></div>
+    <div class="sg gold"><div class="sn">${vipIn}</div><div class="st">VIP دخلوا</div></div>
+    <div class="sg g"><div class="sn">${normalIn}</div><div class="st">عاديين دخلوا</div></div>
+  `;
+  const items=document.getElementById('attItems');
+  if(!attendance.length){
+    items.innerHTML='<div style="color:var(--muted);text-align:center;padding:20px;font-size:.9rem">لم يتم تسجيل أي دخول بعد</div>';
+  } else {
+    items.innerHTML=[...attendance].reverse().map(a=>`
+      <div class="att-item">
+        <span><span class="dot ${a.value==='VIP'?'gold':'g'}"></span><span class="an">${a.name}</span></span>
+        <span class="at">${a.time}</span>
+      </div>`).join('');
+  }
+}
+
+function exportCSV(){
+  if(!attendance.length){alert('لا يوجد سجل دخول بعد');return;}
+  const rows=[['الاسم','رقم الهاتف','القيمة','حالة الدفع','وقت الدخول']];
+  attendance.forEach(a=>rows.push([a.name,a.phone,a.value,a.payment==='full'?'دفع كامل':'باقي مبلغ',a.time]));
+  const csv='\uFEFF'+rows.map(r=>r.join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`سجل_دخول_SE_22_${new Date().toLocaleDateString('ar')}.csv`;
+  a.click();
+}
+</script>
+</body>
+</html>
